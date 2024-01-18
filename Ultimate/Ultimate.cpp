@@ -87,6 +87,21 @@ void SplitString(const std::string& origion, std::unordered_set<std::string>& re
 		res.insert(origion.substr(startPos));
 	}
 }
+std::string TrimSpecialChar(const std::string& str, const std::string& specialChar)
+{
+	if (specialChar.empty())
+	{
+		std::string defaultSpecialChar = "\t\n,.;:?!'\"+-*/=_<>()[]{}\\~@#$%^&";
+		return TrimSpecialChar(str, defaultSpecialChar);
+	}
+	size_t start = str.find_first_not_of(specialChar);
+	if (start == std::string::npos)
+	{
+		return "";  // ×Ö·û´®½ö°üº¬ÌØÊâ×Ö·û
+	}
+	size_t end = str.find_last_not_of(specialChar);
+	return str.substr(start, end - start + 1);
+}
 std::string GetLowercase(const std::string& s)
 {
 	std::string result = s;

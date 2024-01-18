@@ -29,6 +29,7 @@ extern std::string GetStringTime();
 ///
 extern void SplitString(const std::string& origion, std::vector<std::string>& res, const std::string& spliter);
 extern void SplitString(const std::string& origion, std::unordered_set<std::string>& res, const std::string& spliter);
+extern std::string TrimSpecialChar(const std::string& str, const std::string& specialChar = "");
 extern std::string GetLowercase(const std::string& s);
 extern std::string GetUppercase(const std::string& s);
 
