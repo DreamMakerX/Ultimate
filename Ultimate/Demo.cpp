@@ -19,33 +19,43 @@ void GetSplitString()
 {
 	std::string target = "name,age,skills";
 
-	//字符串分割，保存至vector
-	std::vector<std::string> resultVec;
-	SplitString(target, resultVec, ",");
+	//字符串分割（按分隔符），保存至vector
+	std::vector<std::string> resultSpec = SplitString(target, ",");
 	std::cout << "字符串分割，保存至vector（\"name,age,skills\"）: " << std::endl;
-	for (auto item : resultVec)
+	for (auto item : resultSpec)
 	{
 		std::cout << item << std::endl;
 	}
 
-	//字符串分割，保存至unordered_set
-	std::unordered_set<std::string> resultSet;
-	SplitString(target, resultSet, ",");
-	std::cout << "字符串分割，保存至unordered_set（\"name,age,skills\"）: " << std::endl;
-	for (auto item : resultSet)
+	//字符串分割(按长度)，保存至vector
+	std::vector<std::string> resultLen = SplitString(target, 4);
+	std::cout << "字符串分割(按长度)，保存至vector（\"name,age,skills\"）: " << std::endl;
+	for (auto item : resultLen)
 	{
 		std::cout << item << std::endl;
 	}
 
+	//去除开头目标字符
+	std::cout << "去除开头目标字符(\",Var1,\", \",\"): " << TrimFrontSpecialChar(",Var1,", ",").c_str() << std::endl;
+	//去除末尾目标字符
+	std::cout << "去除末尾目标字符(\",Var1,\", \",\"): " << TrimBackSpecialChar(",Var1,", ",").c_str() << std::endl;
 	//去除首尾目标字符
 	std::cout << "去除首尾目标字符(\",Var1,\", \",\"): " << TrimSpecialChar(",Var1,", ",").c_str() << std::endl;
 	//去除首尾目标字符,无目标字符，默认去除\t\n,.;:?!'\"+-*/=_<>()[]{}\\~@#$%^&
 	std::cout << "去除首尾目标字符,不传入目标字符(\"#Var1@\"): " << TrimSpecialChar("#Var1@").c_str() << std::endl;
+
+	//去除重复目标字符
+	std::cout << "去除重复目标字符(\"123004\", \"0\"): " << RemoveDuplicateString("123004", "0").c_str() << std::endl;
 	
 	//字符串转小写
 	std::cout << "字符串转小写(\"TrUe\"): " << GetLowercase("TrUe").c_str() << std::endl;
 	//字符串转大写
 	std::cout << "字符串转大写(\"TrUe\"): " << GetUppercase("TrUe").c_str() << std::endl;
+
+	//阿拉伯数字转中文小写
+	std::cout << "阿拉伯数字转中文小写(\"123123123\"): " << Convert2Chinese(DataTypeConvert(123123123)).c_str() << std::endl;
+	//阿拉伯数字转中文大写
+	std::cout << "阿拉伯数字转中文大写(\"123123123\"): " << Convert2BigChinese(DataTypeConvert(123123123)).c_str() << std::endl;
 
 	PrintSeparate();
 }

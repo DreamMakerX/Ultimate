@@ -1,4 +1,5 @@
 #include <io.h>
+#include <map>
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -55,52 +56,119 @@ std::string GetStringTime()
 	return time;
 }
 
-void SplitString(const std::string& origion, std::vector<std::string>& res, const std::string& spliter)
+std::vector<std::string> SplitString(const std::string& origion, const std::string& spliter)
 {
 	//split string by spliter
+	std::vector<std::string> result;
 	std::string::size_type startPos, endPos;
 	endPos = origion.find(spliter);
 	startPos = 0;
 	while (std::string::npos != endPos)
 	{
-		res.push_back(origion.substr(startPos, endPos - startPos));
+		result.push_back(origion.substr(startPos, endPos - startPos));
 		startPos = endPos + spliter.size();
 		endPos = origion.find(spliter, startPos);
 	}
 	if (startPos != origion.length()) {
-		res.push_back(origion.substr(startPos));
+		result.push_back(origion.substr(startPos));
 	}
+	return result;
 }
-void SplitString(const std::string& origion, std::unordered_set<std::string>& res, const std::string& spliter)
+std::vector<std::string> SplitString(std::string input, int len, bool reverse) {
+	std::vector<std::string> result;
+
+	if (len <= 0 || len >= input.size()) {
+		result.push_back(input);
+		return result;
+	}
+
+	if (reverse)
+	{
+		int pos = input.size();
+		while (pos > 0) {
+			int count = min(len, pos);
+			result.push_back(input.substr(pos - count, count));
+			pos -= count;
+		}
+	}
+	else
+	{
+		int index = 0;
+		while (index < input.size()) {
+			result.push_back(input.substr(index, len));
+			index += len;
+		}
+	}
+
+	return result;
+}
+std::unordered_set<std::string> SplitStringSet(const std::string& origion, const std::string& spliter)
 {
 	//split string by spliter
+	std::unordered_set<std::string> result;
 	std::string::size_type startPos, endPos;
 	endPos = origion.find(spliter);
 	startPos = 0;
 	while (std::string::npos != endPos)
 	{
-		res.insert(origion.substr(startPos, endPos - startPos));
+		result.insert(origion.substr(startPos, endPos - startPos));
 		startPos = endPos + spliter.size();
 		endPos = origion.find(spliter, startPos);
 	}
 	if (startPos != origion.length()) {
-		res.insert(origion.substr(startPos));
+		result.insert(origion.substr(startPos));
 	}
+	return result;
 }
 std::string TrimSpecialChar(const std::string& str, const std::string& specialChar)
+{
+	return TrimBackSpecialChar(TrimFrontSpecialChar(str, specialChar), specialChar);;
+}
+std::string TrimFrontSpecialChar(const std::string& str, const std::string& specialChar)
 {
 	if (specialChar.empty())
 	{
 		std::string defaultSpecialChar = "\t\n,.;:?!'\"+-*/=_<>()[]{}\\~@#$%^&";
-		return TrimSpecialChar(str, defaultSpecialChar);
+		return TrimFrontSpecialChar(str, defaultSpecialChar);
 	}
-	size_t start = str.find_first_not_of(specialChar);
-	if (start == std::string::npos)
+	auto start = str.find_first_not_of(specialChar);
+
+	if (start != std::string::npos)
 	{
-		return "";  // 字符串仅包含特殊字符
+		return str.substr(start, str.length() - start);
 	}
-	size_t end = str.find_last_not_of(specialChar);
-	return str.substr(start, end - start + 1);
+
+	return str;
+}
+std::string TrimBackSpecialChar(const std::string& str, const std::string& specialChar)
+{
+	if (specialChar.empty())
+	{
+		std::string defaultSpecialChar = "\t\n,.;:?!'\"+-*/=_<>()[]{}\\~@#$%^&";
+		return TrimBackSpecialChar(str, defaultSpecialChar);
+	}
+	auto end = str.find_last_not_of(specialChar);
+
+	if (end != std::string::npos)
+	{
+		return str.substr(0, end + 1);
+	}
+
+	return str;
+}
+std::string RemoveDuplicateString(const std::string& str, const std::string& duplicate)
+{
+	if (duplicate.empty()) {
+		return str;
+	}
+
+	size_t pos = 0;
+	std::string result = str;
+	while ((pos = result.find(duplicate + duplicate, pos)) != std::string::npos) {
+		result.replace(pos, 2 * duplicate.length(), duplicate);
+	}
+
+	return result;
 }
 std::string GetLowercase(const std::string& s)
 {
@@ -113,6 +181,97 @@ std::string GetUppercase(const std::string& s)
 	std::string result = s;
 	std::transform(result.begin(), result.end(), result.begin(), ::toupper);
 	return result;
+}
+std::string ConvertSingle2Chinese(const std::string& numString)
+{
+	std::string result;
+	std::string units[] = { "", "十", "百", "千" };
+	std::map<char, std::string> values = {
+		{'0',"零"},
+		{'1',"一"},
+		{'2',"二"},
+		{'3',"三"},
+		{'4',"四"},
+		{'5',"五"},
+		{'6',"六"},
+		{'7',"七"},
+		{'8',"八"},
+		{'9',"九"} };
+	size_t len = numString.length();
+	for (int i = len - 1; i >= 0; --i)
+	{
+		std::string value = values[numString[i]];
+		std::string unit = units[len - i - 1];
+		//数值为零，删除该值的单位
+		if (!value.compare("零"))
+		{
+			unit = "";
+		}
+		result = value + unit + result;
+	}
+	//去除重复的零
+	result = RemoveDuplicateString(result, "零");
+	//去除末尾的零
+	result = TrimBackSpecialChar(result, "零");
+
+	return result;
+}
+std::string Convert2Chinese(const std::string& numString) {
+	//将阿拉伯数字转为中文小写数字（万亿/兆内）
+	if (numString.size() > 16)
+	{
+		return "输入值超出转换范围";
+	}
+	std::string result;
+	std::string units[] = { "", "万", "亿", "兆" };
+	std::vector<std::string> groups = SplitString(numString, 4, true);
+	size_t len = groups.size();
+	for (int i = 0; i < len; ++i)
+	{
+		std::string value = ConvertSingle2Chinese(groups[i]);
+		std::string unit = units[i];
+		//单组为空，不加单位
+		if (!value.compare("零"))
+		{
+			unit = "";
+		}
+		result = value + unit + result;
+	}
+	//去除首尾的零
+	return TrimSpecialChar(result, "零");
+}
+std::string Convert2BigChinese(const std::string& numString)
+{
+	std::string chinese = Convert2Chinese(numString);
+
+	std::map<std::string, std::string> digitMap{
+		{"零","零"},
+		{"一","壹"},
+		{"二","贰"},
+		{"三","叁"},
+		{"四","肆"},
+		{"五","伍"},
+		{"六","陆"},
+		{"七","柒"},
+		{"八","捌"},
+		{"九","玖"},
+		{"十","拾"},
+		{"百","佰"},
+		{"千","仟"},
+		{"万","万"},
+		{"亿","亿"},
+		{"兆","兆"} };
+	std::string output;
+	for (int i = 0; i < chinese.length(); i += 2) {
+		std::string digit = chinese.substr(i, 2);
+		if (digitMap.find(digit) != digitMap.end()) {
+			output += digitMap[digit];
+		}
+		else {
+			output += digit;
+		}
+	}
+	return output;
 }
 
 std::string EncodeBinaryToBase64(const unsigned char* body, const unsigned int& len)

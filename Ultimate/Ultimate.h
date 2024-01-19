@@ -27,11 +27,18 @@ extern std::string GetStringTime();
 ///  ×Ö·û´®
 /// </summary>
 ///
-extern void SplitString(const std::string& origion, std::vector<std::string>& res, const std::string& spliter);
-extern void SplitString(const std::string& origion, std::unordered_set<std::string>& res, const std::string& spliter);
+extern std::vector<std::string> SplitString(const std::string& origion,  const std::string& spliter);
+extern std::vector<std::string> SplitString(std::string input, int len, bool reverse = false);
+extern std::unordered_set<std::string> SplitStringSet(const std::string& origion, const std::string& spliter);
 extern std::string TrimSpecialChar(const std::string& str, const std::string& specialChar = "");
+extern std::string TrimFrontSpecialChar(const std::string& str, const std::string& specialChar = "");
+extern std::string TrimBackSpecialChar(const std::string& str, const std::string& specialChar = "");
+extern std::string RemoveDuplicateString(const std::string& str, const std::string& duplicate);
 extern std::string GetLowercase(const std::string& s);
 extern std::string GetUppercase(const std::string& s);
+extern std::string Convert2Chinese(const std::string& numString);
+extern std::string Convert2BigChinese(const std::string& numString);
+extern std::string ConvertSingle2Chinese(const std::string& numString);
 
 /// <summary>
 ///  ±àÂë
